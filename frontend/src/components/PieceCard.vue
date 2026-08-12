@@ -2,6 +2,11 @@
 defineProps({
   piece: Object
 })
+const statusNames = {
+  not_started: 'Не начато',
+  in_progress: 'В процессе',
+  learned: 'Выучено'
+}
 </script>
 
 <template>
@@ -29,7 +34,7 @@ defineProps({
       </div>
 
       <v-chip>
-        {{ piece.status }}
+        {{ statusNames[piece.status] }}
       </v-chip>
     </v-card-text>
   </v-card>

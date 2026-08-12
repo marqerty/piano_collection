@@ -1,29 +1,41 @@
 <script setup>
+import { ref, onMounted, computed } from 'vue'
+
 import Header from '../components/Header.vue'
 import PieceCard from '../components/PieceCard.vue'
-const pieces = [
-  {
-    id: 1,
-    title: 'Ноктюрн №2',
-    composer: 'Frédéric Chopin',
-    difficulty: 5,
-    status: 'В процессе'
-  },
-  {
-    id: 2,
-    title: 'Лунная соната',
-    composer: 'Ludwig van Beethoven',
-    difficulty: 4,
-    status: 'Выучено'
-  },
-  {
-    id: 3,
-    title: 'К Элизе',
-    composer: 'Ludwig van Beethoven',
-    difficulty: 3,
-    status: 'Не начато'
-  }
+
+const pieces = ref([])
+const search = ref('')
+
+const composers = [
+  'Frédéric Chopin',
+  'Ludwig van Beethoven'
 ]
+
+const genres = [
+  'Ноктюрн',
+  'Соната',
+  'Пьеса'
+]
+
+const statuses = [
+  'Не начато',
+  'В процессе',
+  'Выучено'
+]
+
+const difficulties = [1, 2, 3, 4, 5]
+
+onMounted(async () => {
+  const response = await fetch('/api/pieces')
+  pieces.value = await response.json()
+})
+
+const filteredPieces = computed(() => {
+  return pieces.value.filter(piece =>
+    piece.title.toLowerCase().includes(search.value.toLowerCase())
+  )
+})
 </script>
 
 <template>
@@ -32,8 +44,57 @@ const pieces = [
     <v-container>
       <h1>Мои произведения</h1>
       
+      <!-- статистика -->
+      <!-- <v-row class="mb-4">
+        <v-col cols="12" sm="4">
+          <v-card color="green-lighten-5">
+            <v-card-text>
+
+              <div class="text-medium-emphasis">
+                Всего произведений
+              </div>
+              <div class="text-h4">
+                {{ pieces.length }}
+              </div>
+
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <v-col cols="12" sm="4">
+          <v-card color="green-lighten-5">
+            <v-card-text>
+
+              <div class="text-medium-emphasis">
+                Выучено
+              </div>
+              <div class="text-h4">
+                {{ pieces.filter(piece => piece.status === 'Выучено').length }}
+              </div>
+              
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <v-col cols="12" sm="4">
+          <v-card color="green-lighten-5">
+            <v-card-text>
+              
+              <div class="text-medium-emphasis">
+                В процессе
+              </div>
+              <div class="text-h4">
+                {{ pieces.filter(piece => piece.status === 'В процессе').length }}
+              </div>
+
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row> -->
+
       <!-- поисковая строка -->
       <v-text-field
+      v-model="search"
       label="Поиск произведения"
       prepend-inner-icon="mdi-magnify"
       variant="outlined"
@@ -77,7 +138,7 @@ const pieces = [
       <!-- карточки с произведениями -->
       <v-row>
         <v-col
-          v-for="piece in pieces"
+          v-for="piece in filteredPieces"
           :key="piece.id"
           cols="12"
           md="6"
@@ -99,3 +160,5 @@ const pieces = [
     />
   </v-main>
 </template>
+<style scoped>
+</style>
