@@ -8,6 +8,12 @@ defineProps({
   <v-card>
     <v-card-title>
       {{ piece.title }}
+
+      <v-btn
+        icon="mdi-pencil"
+        variant="text"
+        size="small"
+      />
     </v-card-title>
 
     <v-card-text>
