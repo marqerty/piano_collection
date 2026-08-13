@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 import Header from '../components/Header.vue'
 import PieceCard from '../components/PieceCard.vue'
@@ -26,16 +26,32 @@ const statuses = [
 
 const difficulties = [1, 2, 3, 4, 5]
 
-onMounted(async () => {
-  const response = await fetch('/api/pieces')
+// onMounted(async () => {
+//   const response = await fetch('/api/pieces')
+//   pieces.value = await response.json()
+// })
+
+const loadPieces = async () => {
+  const response = await fetch(
+    `/api/pieces?search=${encodeURIComponent(search.value)}`
+  )
+
   pieces.value = await response.json()
+}
+
+watch(search, () => {
+  loadPieces()
 })
 
-const filteredPieces = computed(() => {
-  return pieces.value.filter(piece =>
-    piece.title.toLowerCase().includes(search.value.toLowerCase())
-  )
+onMounted(() => {
+  loadPieces()
 })
+// поиск произведений по названию
+// const filteredPieces = computed(() => {
+//   return pieces.value.filter(piece =>
+//     piece.title.toLowerCase().includes(search.value.toLowerCase())
+//   )
+// })
 </script>
 
 <template>
@@ -138,7 +154,7 @@ const filteredPieces = computed(() => {
       <!-- карточки с произведениями -->
       <v-row>
         <v-col
-          v-for="piece in filteredPieces"
+          v-for="piece in pieces"
           :key="piece.id"
           cols="12"
           md="6"

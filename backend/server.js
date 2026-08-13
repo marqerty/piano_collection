@@ -4,31 +4,33 @@ const pool = require('./db');
 
 const app = express();
 
-// получение всех произведений с информацией
+// получение произведений с фильтром по названию
 app.get('/api/pieces', async (req, res) => {
   try {
+    const search = req.query.search || ''
+
     const result = await pool.query(`
-    SELECT
+      SELECT
         pieces.id,
         pieces.title,
         pieces.difficulty,
         pieces.status,
         CONCAT(composers.first_name, ' ', composers.last_name) AS composer
-    FROM pieces
-    JOIN composers
+      FROM pieces
+      JOIN composers
         ON pieces.composer_id = composers.id
-    `);
+      WHERE pieces.title ILIKE $1
+    `, [`%${search}%`])
 
-    res.json(result.rows);
+    res.json(result.rows)
   } catch (error) {
-    console.error(error);
+    console.error(error)
 
     res.status(500).json({
       message: 'Ошибка при получении произведений'
-    });
+    })
   }
-});
-
+})
 
 app.listen(3000, () => {
     console.log('Backend запущен: http://localhost:3000');
